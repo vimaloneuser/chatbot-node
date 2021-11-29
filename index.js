@@ -95,15 +95,57 @@ let defaultQuestion = [
 ];
 
 let clientOne = [
-  { intent: "q1", question: "What is aligner ?", answer: "aligner is teeth treatment pack." },
-  { intent: "q2", question: "When to use aligner ?", answer: "You should aligner when your teeth become in bad shape" },
-  { intent: "q3", question: "Is aligner treatment is usefull for teeth ?", answer: "Yes aligner is very good treatment." }
+  {
+    intent: "q1", question: "What is aligner ?",
+    answer: "Clear aligners are orthodontic devices that are a transparent, plastic form of dental braces used to adjust teeth."
+  },
+  {
+    intent: "q2", question: "What are aligners used for?",
+    answer: " Clear Aligners are transparent trays made of special material which are used to straighten teeth just like braces."
+  },
+  {
+    intent: "q3", question: "Is aligners better than braces?",
+    answer: "Generally speaking, aligners are more comfortable than braces."
+  },
+  {
+    intent: "q4", question: "Do teeth aligners really work?",
+    answer: "Yes it works"
+  },
+  {
+    intent: "q5", question: "Are aligners safe?",
+    answer: "Yes its safe"
+  },
+  {
+    intent: "q6", question: "Are aligners painful?",
+    answer: "In most cases, pain or discomfort will occur when the Invisalign® aligners are first fitted and when aligner trays are changed, about every two weeks. For most,"
+  },
 ]
 
 let clientwo = [
-  { intent: "q1", question: "What is aligner ?", answer: "aligner is nothing." },
-  { intent: "q2", question: "When to use aligner ?", answer: "Do not use aligner" },
-  { intent: "q3", question: "Is aligner treatment is usefull for teeth ?", answer: "No it in not usefull" }
+ {
+    intent: "q1", question: "Are aligners expensive?",
+    answer: "The average cost, according to the manufacturer, is between Rs. 1,50,000-Rs. ... "
+  },
+  {
+    intent: "q2", question: "Which is cheaper braces or aligners?",
+    answer: "You may pay between $3,000 and $7,350 for traditional braces."
+  },
+  {
+    intent: "q3", question: "Is aligners better than braces?",
+    answer: "Yes its way better that braces"
+  },
+  {
+    intent: "q4", question: "Do teeth aligners really work?",
+    answer: "If you're considering teeth straightening options, you've no doubt questioned which you should choose between clear aligners like Invisalign and conventional braces."
+  },
+  {
+    intent: "q5", question: "Are aligners safe?",
+    answer: "“Teeth aligners, when under the direct supervision of an orthodontist, are indeed safe and highly effective at achieving tooth movement,”"
+  },
+  {
+    intent: "q6", question: "Are clear aligners permanent?",
+    answer: "This is a common practice in orthodontics and you will receive instructions on wearing the retainer all day initially and for shorter periods gradually."
+  },
 ]
 
 // exports.botAnswer = async (request, response) => {

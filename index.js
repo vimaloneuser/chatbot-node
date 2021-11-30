@@ -14,6 +14,16 @@ const io = socketio(server);
 app.use(cors());
 app.use(router);
 
+
+app.use(function (req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+	res.setHeader("Access-Control-Allow-Headers", "*");
+	req.header("Content-Type", "application/json");
+	res.setHeader("Access-Control-Allow-Credentials", true);
+	next();
+});
+
 let nlp, client = 1;
 
 const nlpset = async (clientNumber) => {

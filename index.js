@@ -9,52 +9,22 @@ const router = require('./router');
 const { dockStart } = require('@nlpjs/basic');
 const app = express();
 const server = http.createServer(app);
-const io = socketio(server);
+let mysql = require('mysql');
 
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*"
+  }
+});
 app.use(cors());
 app.use(router);
 
-
-app.use(function (req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
-	res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
-	res.setHeader("Access-Control-Allow-Headers", "*");
-	req.header("Content-Type", "application/json");
-	res.setHeader("Access-Control-Allow-Credentials", true);
-	next();
+var con = mysql.createConnection({
+  host: "192.168.1.23",
+  user: "carboard_pwa",
+  password: "02URNv2h",
+  database: "carboard_pwa"
 });
-
-let nlp, client = 1;
-
-const nlpset = async (clientNumber) => {
-  console.log(clientNumber)
-  nlp = null;
-  const dock = await dockStart({ use: ['Basic'] });
-  nlp = dock.get('nlp');
-  nlp.addLanguage('en');
-
-  defaultQuestion.map(item => {
-    nlp.addDocument('en', item.question, `${item.intent}`)
-    nlp.addAnswer('en', `${item.intent}`, item.answers)
-  });
-
-  if (clientNumber == 1)
-    clientOne.map(item => {
-      nlp.addDocument('en', item.question, `treament${item.intent}`)
-      nlp.addAnswer('en', `treament${item.intent}`, item.answer)
-    });
-  if (clientNumber == 2)
-    clientwo.map(item => {
-      nlp.addDocument('en', item.question, `treament${item.intent}`)
-      nlp.addAnswer('en', `treament${item.intent}`, item.answer)
-    });
-  nlp.addAnswer('en', `None`, 'Sorry I did not understand you')
-  await nlp.train();
-}
-
-(async () => {
-  nlpset(1);
-})();
 
 let defaultQuestion = [
   {
@@ -104,6 +74,66 @@ let defaultQuestion = [
   }
 ];
 
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  req.header("Content-Type", "application/json");
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
+});
+
+let nlp, client = 1;
+
+const nlpset = async (clientNumber) => {
+  nlp = null;
+  const dock = await dockStart({ use: ['Basic'] });
+  nlp = dock.get('nlp');
+  nlp.addLanguage('en');
+  nlp.settings.autoSave = false;
+
+  var sql = "SELECT * FROM `ChatBotQuestions` left JOIN ChatBotAnswers on ChatBotQuestions.id = ChatBotAnswers.ChatBotQueId";
+  await con.query(sql, function (err, query_data) {
+    if (err) throw err;
+    defaultQuestion.map(itm => {
+      nlp.addDocument('en', itm.question, `${itm.question}`);
+      nlp.addAnswer('en', `${itm.question}`, itm.answers);
+    });
+
+    query_data.map(item => {
+      nlp.addDocument('en', item.question, `${item.question}`);
+      nlp.addAnswer('en', `${item.question}`, item.answer);
+    });
+    nlp.addAnswer('en', 'None', 'Sorry I did not get your meaning! Please ask again.')
+    nlp.train();
+  });
+
+  /*    defaultQuestion.map(item => {
+      nlp.addDocument('en', item.question, `${item.intent}`)
+      nlp.addAnswer('en', `${item.intent}`, item.answers)
+    });
+   */
+  /*  if (clientNumber == 1)
+     clientOne.map(item => {
+       nlp.addDocument('en', item.question, `treament${item.intent}`)
+       nlp.addAnswer('en', `treament${item.intent}`, item.answer)
+     }); */
+  /*   if (clientNumber == 2)
+      clientwo.map(item => {
+        nlp.addDocument('en', item.question, `treament${item.intent}`)
+        nlp.addAnswer('en', `treament${item.intent}`, item.answer)
+      }); */
+
+  //nlp.addAnswer('en', `None`, 'Sorry I did not understand you')
+  await nlp.train();
+}
+
+(async () => {
+  nlpset(1);
+})();
+
+
+
 let clientOne = [
   {
     intent: "q1", question: "What is aligner ?",
@@ -132,7 +162,7 @@ let clientOne = [
 ]
 
 let clientwo = [
- {
+  {
     intent: "q1", question: "Are aligners expensive?",
     answer: "The average cost, according to the manufacturer, is between Rs. 1,50,000-Rs. ... "
   },
@@ -168,6 +198,11 @@ let clientwo = [
 
 io.on('connect', async (socket) => {
   socket.on('join', ({ name }, callback) => {
+
+    /* (async () => {
+      nlpset(1);
+    })(); */
+
     console.log(name, "Joined socket room")
     socket.join("1");
     socket.emit('message', { admin: 'doctor', text: `${name}, Welcome to doctor AI bot.` });
@@ -176,6 +211,7 @@ io.on('connect', async (socket) => {
 
   socket.on('sendMessage', async (message, callback) => {
     const res = await nlp.process('en', message);
+
     io.to("1").emit('message', { user: "doctor", text: res.answer });
 
     console.log(res)
@@ -193,4 +229,4 @@ io.on('connect', async (socket) => {
   })
 });
 
-server.listen(process.env.PORT || 5000, () => console.log(`Server has started.`));
+server.listen(2000, () => console.log(`Server has started.`));
